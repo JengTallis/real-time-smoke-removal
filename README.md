@@ -6,8 +6,6 @@ This is an image enhancement project on medical videos.
 ```
 med_video_enhancement
 ├── __init__.py
-├── util
-│   └── evaluate_img.py
 ├── img_util
 │   ├── __init__.py
 │   ├── constrast_stretch.py
@@ -16,7 +14,8 @@ med_video_enhancement
 │   ├── retinex.py
 │   ├── histo_eq.py
 │   ├── histo_match.py
-│   └── freq.py
+│   ├── histo_match.py
+│   └── eval_img.py
 ├── vid_util
 │   ├── __init__.py
 │   ├── vid_splitter.py
@@ -28,7 +27,6 @@ med_video_enhancement
 ```
 --------------------------------
 #### [hackMD notes](https://hackmd.io/SkVk1-R0TeGcZOkP3kn0xw)
-
 
 ### Problem Description
 
