@@ -13,7 +13,7 @@ python3 get_frame.py
 '''
 import time
 import os
-import cv2	# OpenCV3
+import cv2 as cv	# OpenCV3
 
 ''' 
 Set relative path to absolute
@@ -32,17 +32,17 @@ OUT_DIR = here(out_dir)
 '''
 def video2frames(video, out_dir):
 	t_start = time.time()			# log start time
-	cap = cv2.VideoCapture(video)	# capture the feed
+	cap = cv.VideoCapture(video)	# capture the feed
 	try:
 		os.mkdir(out_dir)			# make output directory
 	except OSError:
 		pass
-	vid_len = int (cap.get(cv2.CAP_PROP_FRAME_COUNT)) - 1		# number of frames in the video
+	vid_len = int (cap.get(cv.CAP_PROP_FRAME_COUNT)) - 1		# number of frames in the video
 	print ("Num of frames: ", vid_len)
 	count = 0						# count the number of frames processed
 	while cap.isOpened():
 		ret, frame = cap.read()		# extract frame
-		cv2.imwrite(out_dir + "/%#05d.jpg" % (count+1), frame)	# write frame to img output
+		cv.imwrite(out_dir + "/%#05d.jpg" % (count+1), frame)	# write frame to img output
 		count += 1
 		if (count > (vid_len-1)):
 			time_end = time.time()	# log end time
