@@ -31,7 +31,7 @@ g: factor for gamma correction to achieve more colorful result
 res: restored image
 '''
 
-def smoke_restore(img, p, d, max_window, balance):
+def smoke_restore(img, p, d, max_window, balance, g):
 	# === Check if input is out of bound ===
 	max_window = math.floor(max_window)
 	if max_window < 1:
@@ -101,17 +101,29 @@ def smoke_restore(img, p, d, max_window, balance):
 		r = smooth_r
 		mr = r.mean(2)
 
+	# === Gamma Correction (bottom 1/3 of the original) ===
+	lo = np.log(mo[math.floor(height*2/3):height,:]+0.5/225)	# adding a small const to avoid log(0) error
+	lr = np.log(mr[math.floor(height*2/3):height,:]+0.5/225)
+	mlo = np.mean(lo)
+	mlr = np.mean(lr)
+	slo = np.std(lo)
+	slr = np.std(lr)
+	pwr = g * slo / slr
+	u = np.power(r, pwr) * math.exp(mlo-mlr*pwr)
+
+	# === Tone Mapping ===
+	mg = np.max(u)
+	t = np.divide(u, 1+(1.0-1.0/mg)*u)
+
+	# === return restored img ===
+	return t
 
 
-
-	return r
-
-
-filename = "5.jpg"
+filename = "5.jpeg"
 img = os.path.basename(filename)
 img = cv.imread(filename)
 
-res = smoke_restore(img, 0.75, 17, 3, 0.95)
+res = smoke_restore(img, 0.70, 17, 3, 0.95, 1.3)
 RGB_img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 RGB_res = cv.cvtColor(res, cv.COLOR_BGR2RGB)
 
