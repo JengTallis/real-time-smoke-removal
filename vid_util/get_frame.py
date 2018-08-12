@@ -9,11 +9,18 @@ output: frames of the video
 
 usage:
 python3 get_frame.py
+
+Usage: 
+Under 	parent of real-time-smoke-removal
+Run 	python3 -m real-time-smoke-removal.vid_util.get_frame
 +++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 '''
 import time
 import os
 import cv2 as cv	# OpenCV3
+import math
+from ..img_util.smoke_restore import smoke_restore
+
 
 ''' 
 Set relative path to absolute
@@ -51,5 +58,32 @@ def video2frames(video, out_dir):
 			print ("Extraction time: %d seconds." % (time_end-time_start))
 			break
 
-video2frames(VIDEO, OUT_DIR)
+def real_time_desmoke_video(video):
+	cap = cv.VideoCapture(video)	# capture the feed
+	ret, frame = cap.read()
+	(height, width) = frame.shape[:2]
+	scale = 0.35
+	h = math.floor(height*scale)
+	w = math.floor(width*scale)
+	while(cap.isOpened()):
+		rs_frame = cv.resize(frame, (w, h)) 
+		res = smoke_restore(rs_frame, 0.75, 7, 3, 0.95, 1.3)
+		# --- display desmoked img ---
+		cv.namedWindow('desmoke', cv.WINDOW_NORMAL)
+		cv.resizeWindow('desmoke', (w, h))
+		cv.imshow('desmoke', res)
+		# --- display original img ---
+		cv.namedWindow('ori', cv.WINDOW_NORMAL)
+		cv.resizeWindow('ori', (w, h))
+		cv.imshow('ori', rs_frame)
+
+		ret, frame = cap.read()
+		if cv.waitKey(1) & 0xFF == ord('q'):
+			break
+
+	cap.release()
+	cv.destroyAllWindows()
+
+real_time_desmoke_video(VIDEO)
+#video2frames(VIDEO, OUT_DIR)
 		

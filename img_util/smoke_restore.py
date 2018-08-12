@@ -16,7 +16,9 @@ import numpy as np
 import os
 import math
 from matplotlib import pyplot as plt
-import color_balance	# color balance algorithm
+
+#import color_balance	# color balance algorithm
+from . import color_balance
 
 '''
 # --- Inputs ---
@@ -70,17 +72,21 @@ def smoke_restore(img, p, d, max_window, balance, g):
 	# === Compute Saturation Bound ===
 	sigmaColor = 250
 	sigmaSpace = 150
-	# cv.bilateralFilter(src, d, sigmaColor, sigmaSpace)
-	a = cv.bilateralFilter(w, d, sigmaColor, sigmaSpace)							# a = bil(W)
-	#a = cv.medianBlur(w, d)		# d should be odd positive int
-	b = a - cv.bilateralFilter((np.absolute(w - a)), d, sigmaColor, sigmaSpace)		# b = a - bil(|w-a|)
 
+	# --- Version 1: cv.medianBlur(src, d) ---
+	w = w.astype(np.uint8)
+	#a = cv.medianBlur(w, d)		# d should be odd positive int
+	#b = a - cv.medianBlur((np.absolute(w - a)), d)
+
+	# --- version 2: cv.bilateralFilter(src, d, sigmaColor, sigmaSpace) ---
+	a = cv.bilateralFilter(w, d, sigmaColor, sigmaSpace)							# a = bil(W)
+	b = a - cv.bilateralFilter((np.absolute(w - a)), d, sigmaColor, sigmaSpace)		# b = a - bil(|w-a|)
 	# === Infer V(x,y) with w & b bounds ===
-	print("Atmospheric veil")
+	#print("Atmospheric veil")
 	v = p * np.maximum(np.minimum(w,b), 0)											# v = max(min(pb, w),0)
 
 	# === Restore R with Inverse Koschmieder Law ===
-	print("Restoration")
+	#print("Restoration")
 	r = np.zeros(img.shape)						# restored img
 	ones = np.ones(v.shape)
 	fac = np.divide(ones, (ones - v))			# f = 1/(1 - v)
@@ -101,6 +107,8 @@ def smoke_restore(img, p, d, max_window, balance, g):
 		r = smooth_r
 		mr = r.mean(2)
 
+	#return r
+
 	# === Gamma Correction (bottom 1/3 of the original) ===
 	lo = np.log(mo[math.floor(height*2/3):height,:]+0.5/225)	# adding a small const to avoid log(0) error
 	lr = np.log(mr[math.floor(height*2/3):height,:]+0.5/225)
@@ -118,12 +126,12 @@ def smoke_restore(img, p, d, max_window, balance, g):
 	# === return restored img ===
 	return t
 
-
-filename = "5.jpeg"
+'''
+filename = "9.pgm"
 img = os.path.basename(filename)
 img = cv.imread(filename)
 
-res = smoke_restore(img, 0.70, 17, 3, 0.95, 1.3)
+res = smoke_restore(img, 0.75, 17, 3, 0.95, 1.3)
 RGB_img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 RGB_res = cv.cvtColor(res, cv.COLOR_BGR2RGB)
 
@@ -135,3 +143,4 @@ plt.subplot(2, 1, 2)
 plt.imshow(RGB_res)
 plt.xticks([]), plt.yticks([])  # hide tick values on axis
 plt.show()
+'''
