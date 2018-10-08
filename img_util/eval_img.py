@@ -31,7 +31,7 @@ def brightness(img):	# scalar
 	return math.sqrt(0.241*(r**2) + 0.691*(g**2) + 0.068*(b**2))	# perceived brightness
 
 def brightness_gain(ori, processed):
-	return (brightness(processed) - intensity(ori))
+	return (brightness(processed) - brightness(ori))
 
 
 '''
@@ -80,6 +80,14 @@ def contrast_gain(ori, proc, p):
 	return (mean_contrast(proc, p) - mean_contrast(ori, p))
 
 
+'''
+# =========== mean ratio of gradient ============
+'''
+
+
+
+
+'''
 filename = "4.jpeg"
 img = os.path.basename(filename)
 img = cv.imread(filename)
@@ -88,4 +96,4 @@ print(bright)
 p = 1
 mcon = mean_contrast(img, p)
 print(mcon)
-
+'''

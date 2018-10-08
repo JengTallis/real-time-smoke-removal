@@ -17,8 +17,9 @@ import os
 import math
 from matplotlib import pyplot as plt
 
-#import color_balance	# color balance algorithm
-from . import color_balance
+#import color_balance # in this
+#from eval_img import brightness_gain # in this
+from . import color_balance # in vid util
 
 '''
 # --- Inputs ---
@@ -74,7 +75,7 @@ def smoke_restore(img, p, d, max_window, balance, g):
 	sigmaSpace = 150
 
 	# --- Version 1: cv.medianBlur(src, d) ---
-	w = w.astype(np.uint8)
+	#w = w.astype(np.uint8)
 	#a = cv.medianBlur(w, d)		# d should be odd positive int
 	#b = a - cv.medianBlur((np.absolute(w - a)), d)
 
@@ -126,14 +127,35 @@ def smoke_restore(img, p, d, max_window, balance, g):
 	# === return restored img ===
 	return t
 
+
+max_bright = float(2**8)-1
+for i in range(1,13):
+	filename = str(i) + '.jpg'
+	img = os.path.basename(filename)
+	img = cv.imread(filename)
+	res = smoke_restore(img, 0.70, 17, 3, 0.95, 1.3)
+	r = res * max_bright
+	cv.imwrite(str(i) + 'r' + '.jpg', r)
+	# write gray images
+	gimg = cv.cvtColor( img, cv.COLOR_RGB2GRAY )
+	cv.imwrite(str(i) + 'og' + '.jpg', gimg)
+	gres = cv.cvtColor( r, cv.COLOR_RGB2GRAY )
+	cv.imwrite(str(i) + 'rg' + '.jpg', gres)
+
 '''
-filename = "9.pgm"
+filename = '1.jpg'
 img = os.path.basename(filename)
 img = cv.imread(filename)
+res = smoke_restore(img, 0.70, 17, 3, 0.95, 1.3)
+r = res * max_bright
+cv.imwrite('1r.jpg',r)
 
-res = smoke_restore(img, 0.75, 17, 3, 0.95, 1.3)
 RGB_img = cv.cvtColor(img, cv.COLOR_BGR2RGB)
 RGB_res = cv.cvtColor(res, cv.COLOR_BGR2RGB)
+
+gain = brightness_gain(img, res)
+print("Contrast gain")
+print(gain)
 
 plt.subplot(2, 1, 1)
 plt.imshow(RGB_img)
@@ -144,3 +166,4 @@ plt.imshow(RGB_res)
 plt.xticks([]), plt.yticks([])  # hide tick values on axis
 plt.show()
 '''
+
